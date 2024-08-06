@@ -1,6 +1,7 @@
 package local.ateng.boot.common.config.spring;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 
@@ -22,7 +23,7 @@ public class VirtualThreadPerConfig {
      * @Async
      */
     @Bean
-    public AsyncTaskExecutor asyncTaskExecutor() {
+    public AsyncTaskExecutor taskExecutor() {
         return new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());
     }
 
