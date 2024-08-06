@@ -34,7 +34,7 @@ spec:
               containerPort: 20420
           env:
             - name: JAVA_OPTS
-              value: "-server -Xms128m -Xmx2048m -Dspring.profiles.active=dev"
+              value: "-Xms128m -Xmx2048m -Dspring.profiles.active=dev"
           #resources:
           #  limits:
           #    cpu: '2'

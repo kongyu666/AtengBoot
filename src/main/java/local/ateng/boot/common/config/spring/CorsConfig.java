@@ -1,4 +1,4 @@
-package local.ateng.boot.common.config.web;
+package local.ateng.boot.common.config.spring;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

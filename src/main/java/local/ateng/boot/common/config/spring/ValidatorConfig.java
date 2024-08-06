@@ -1,4 +1,4 @@
-package local.ateng.boot.common.config.web;
+package local.ateng.boot.common.config.spring;
 
 import jakarta.validation.Validator;
 import org.hibernate.validator.HibernateValidator;

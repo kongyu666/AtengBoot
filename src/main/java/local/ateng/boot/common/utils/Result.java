@@ -1,234 +1,130 @@
-/*
- * Copyright 2020-2099 sa-token.cc
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package local.ateng.boot.common.utils;
 
-import cn.dev33.satoken.util.SaFoxUtil;
+import com.alibaba.fastjson2.JSON;
+import local.ateng.boot.common.enums.AppCodeEnum;
 
+import java.io.Serial;
 import java.io.Serializable;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
- * 对请求接口返回 Json 格式数据的简易封装。
+ * 统一结果返回处理，支持链式调用
  *
- * <p>
- * 所有预留字段：<br>
- * code = 状态码 <br>
- * msg  = 描述信息 <br>
- * data = 携带对象 <br>
- * </p>
- *
- * @author click33
- * @since 1.22.0
+ * @param <T> 返回的数据类型
+ * @since 2024-05-30 15:16:07
  */
-public class Result extends LinkedHashMap<String, Object> implements Serializable {
-
-    // 预定的状态码
-    public static final String CODE_SUCCESS = "0";
-    public static final String CODE_ERROR = "-1";
-    // 序列化版本号
+public class Result<T> implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
+    private String code; // 状态码
+    private String msg; // 提示信息
+    private T data; // 返回的数据
 
     /**
-     * 构建
+     * 默认构造方法，设置初始的状态码和提示信息
      */
     public Result() {
+        this.code = AppCodeEnum.SUCCESS.getCode();
+        this.msg = AppCodeEnum.SUCCESS.getDescription();
     }
 
     /**
-     * 构建
-     *
-     * @param code 状态码
-     * @param msg  信息
-     * @param data 数据
+     * 静态方法，返回一个错误结果
      */
-    public Result(String code, String msg, Object data) {
-        this.setCode(code);
-        this.setMsg(msg);
-        this.setData(data);
-    }
-
-    /**
-     * 根据 Map 快速构建
-     *
-     * @param map /
-     */
-    public Result(Map<String, ?> map) {
-        this.setMap(map);
-    }
-
-    // 构建成功
-    public static Result ok() {
-        return new Result(CODE_SUCCESS, "请求成功", null);
-    }
-
-    public static Result ok(String msg) {
-        return new Result(CODE_SUCCESS, msg, null);
-    }
-
-    public static Result code(String code) {
-        return new Result(code, null, null);
-    }
-
-    public static Result data(Object data) {
-        return new Result(CODE_SUCCESS, "请求成功", data);
-    }
-
-    // 构建失败
     public static Result error() {
-        return new Result(CODE_ERROR, "服务器异常, 请稍后再试", null);
-    }
-
-    public static Result error(String msg) {
-        return new Result(CODE_ERROR, msg, null);
-    }
-
-    // 构建指定状态码
-    public static Result get(String code, String msg, Object data) {
-        return new Result(code, msg, data);
+        return error(AppCodeEnum.ERROR.getCode(), AppCodeEnum.ERROR.getDescription());
     }
 
     /**
-     * 获取code
-     *
-     * @return code
+     * 静态方法，返回一个带自定义状态码和提示信息的错误结果
      */
-    public Integer getCode() {
-        return (Integer) this.get("code");
+    public static Result error(String code, String msg) {
+        Result r = new Result();
+        r.setCode(code);
+        r.setMsg(msg);
+        return r;
     }
 
     /**
-     * 给code赋值，连缀风格
-     *
-     * @param code code
-     * @return 对象自身
+     * 静态方法，返回一个带自定义状态码和提示信息的成功结果
      */
-    public Result setCode(String code) {
-        this.put("code", code);
-        return this;
+    public static Result ok(String code, String msg) {
+        Result r = new Result();
+        r.setCode(code);
+        r.setMsg(msg);
+        return r;
     }
 
-
-    // ============================  静态方法快速构建  ==================================
-
     /**
-     * 获取msg
-     *
-     * @return msg
+     * 静态方法，返回一个默认的成功结果
      */
-    public String getMsg() {
-        return (String) this.get("msg");
+    public static Result ok() {
+        return new Result();
     }
 
     /**
-     * 给msg赋值，连缀风格
-     *
-     * @param msg msg
-     * @return 对象自身
+     * 静态方法，返回一个包含指定数据的成功结果
      */
-    public Result setMsg(String msg) {
-        this.put("msg", msg);
-        return this;
+    public static <T> Result<T> ok(T data) {
+        Result<T> r = new Result<>();
+        r.setData(data);
+        return r;
     }
 
     /**
-     * 获取data
-     *
-     * @return data
+     * 获取返回的数据
      */
     public Object getData() {
-        return this.get("data");
+        return data;
     }
 
     /**
-     * 给data赋值，连缀风格
-     *
-     * @param data data
-     * @return 对象自身
+     * 设置返回的数据
      */
-    public Result setData(Object data) {
-        this.put("data", data);
+    public Result<T> setData(T data) {
+        this.data = data;
         return this;
     }
 
     /**
-     * 写入一个值 自定义key, 连缀风格
-     *
-     * @param key  key
-     * @param data data
-     * @return 对象自身
+     * 获取data里面的数据，并且设置泛型可以直接转换出对应的类型
      */
-    public Result set(String key, Object data) {
-        this.put(key, data);
-        return this;
+    public <T> T getData(Class<T> clazz) {
+        return JSON.parseObject(JSON.toJSONString(this.getData()), clazz);
     }
 
     /**
-     * 获取一个值 根据自定义key
-     *
-     * @param <T> 要转换为的类型
-     * @param key key
-     * @param cs  要转换为的类型
-     * @return 值
+     * 获取状态码
      */
-    public <T> T get(String key, Class<T> cs) {
-        return SaFoxUtil.getValueByType(get(key), cs);
+    public String getCode() {
+        return code;
     }
 
     /**
-     * 写入一个Map, 连缀风格
-     *
-     * @param map map
-     * @return 对象自身
+     * 设置状态码
      */
-    public Result setMap(Map<String, ?> map) {
-        for (String key : map.keySet()) {
-            this.put(key, map.get(key));
-        }
-        return this;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
+    /**
+     * 获取提示信息
+     */
+    public String getMsg() {
+        return msg;
+    }
+
+    /**
+     * 设置提示信息
+     */
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    /**
+     * 转换为JSON字符串
      */
     @Override
     public String toString() {
-        return "{"
-                + "\"code\": " + this.getCode()
-                + ", \"msg\": " + transValue(this.getMsg())
-                + ", \"data\": " + transValue(this.getData())
-                + "}";
+        return JSON.toJSONString(this);
     }
-
-    /**
-     * 转换 value 值：
-     * 如果 value 值属于 String 类型，则在前后补上引号
-     * 如果 value 值属于其它类型，则原样返回
-     *
-     * @param value 具体要操作的值
-     * @return 转换后的值
-     */
-    private String transValue(Object value) {
-        if (value == null) {
-            return null;
-        }
-        if (value instanceof String) {
-            return "\"" + value + "\"";
-        }
-        return String.valueOf(value);
-    }
-
 }

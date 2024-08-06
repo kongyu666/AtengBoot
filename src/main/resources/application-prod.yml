@@ -159,7 +159,8 @@ management:
     shutdown: # 关闭端点配置
       enabled: true # 启用shutdown端点，允许通过POST请求关闭应用程序
     health: # 健康检查端点配置
-      show-details: never # 显示完整的健康信息，包括详细的检查项
+      #show-details: always # 显示完整的健康信息，包括详细的检查项
+      show-details: never # 显示简短的健康信息
 
 # Snail Job
 snail-job:

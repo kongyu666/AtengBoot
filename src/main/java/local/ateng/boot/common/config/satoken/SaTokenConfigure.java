@@ -1,13 +1,14 @@
 package local.ateng.boot.common.config.satoken;
 
-import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.filter.SaServletFilter;
 import cn.dev33.satoken.httpauth.basic.SaHttpBasicUtil;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.util.SaResult;
-import cn.hutool.json.JSONUtil;
+import local.ateng.boot.common.enums.AppCodeEnum;
+import local.ateng.boot.common.utils.Result;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class SaTokenConfigure implements WebMvcConfigurer {
+    private static final Logger log = LoggerFactory.getLogger(SaTokenConfigure.class);
+
     // 注册 Sa-Token 拦截器，打开注解式鉴权功能
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -48,28 +51,13 @@ public class SaTokenConfigure implements WebMvcConfigurer {
                 new SaServletFilter()
                         .addInclude("/actuator/**")
                         .setAuth(obj -> {
+                            // 放开 /actuator/health 节点，其余接口需要基础验证
                             SaRouter
                                     .notMatch("/actuator/health")
                                     .match("/actuator/**", () -> SaHttpBasicUtil.check("admin:Admin@123"));
                         }).setError(e -> {
-                            // 设置响应头
-                            SaHolder.getResponse().setHeader("Content-Type", "application/json;charset=UTF-8");
-                            // 使用封装的 JSON 工具类转换数据格式
-                            return JSONUtil.toJsonStr(SaResult.error(e.getMessage()));
-                        })
-                        // 前置函数：在每次认证函数之前执行（BeforeAuth 不受 includeList 与 excludeList 的限制，所有请求都会进入）
-                        .setBeforeAuth(r -> {
-                            // ---------- 设置一些安全响应头 ----------
-                            SaHolder.getResponse()
-                                    // 服务器名称
-                                    .setServer("sa-server")
-                                    // 是否可以在iframe显示视图： DENY=不可以 | SAMEORIGIN=同域下可以 | ALLOW-FROM uri=指定域名下可以
-                                    .setHeader("X-Frame-Options", "SAMEORIGIN")
-                                    // 是否启用浏览器默认XSS防护： 0=禁用 | 1=启用 | 1; mode=block 启用, 并在检查到XSS攻击时，停止渲染页面
-                                    .setHeader("X-XSS-Protection", "1; mode=block")
-                                    // 禁用浏览器内容嗅探
-                                    .setHeader("X-Content-Type-Options", "nosniff")
-                            ;
+                            log.error(e.getMessage());
+                            return Result.error(AppCodeEnum.OPERATION_CANCELED.getCode(), AppCodeEnum.OPERATION_CANCELED.getDescription());
                         })
         );
         frBean.setOrder(-101);  // 更改顺序为 -101
