@@ -29,6 +29,7 @@
 !*.config
 !*.sql
 !banner.txt
+!/*.iml
 
 #忽略根目录下的文件
 /temp/
