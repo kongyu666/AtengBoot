@@ -296,8 +296,7 @@
         <dependency>
             <groupId>de.codecentric</groupId>
             <artifactId>spring-boot-admin-starter-client</artifactId>
-            <!-- <version>${spring-boot.version}</version>-->
-            <version>3.2.3</version>
+            <version>${spring-boot.version}</version>
         </dependency>
 
         <!-- EasyExcel是一个基于Java的、快速、简洁、解决大文件内存溢出的Excel处理工具 -->

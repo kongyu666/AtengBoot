@@ -13,7 +13,7 @@ spring:
       enabled: true
   # 数据库的相关配置
   datasource:
-    url: jdbc:postgresql://192.168.1.10:32297/ateng_boot?currentSchema=public  # 数据库连接URL
+    url: jdbc:postgresql://192.168.1.10:32297/ateng_boot?currentSchema=public&stringtype=unspecified  # 数据库连接URL
     username: postgres  # 数据库用户名
     password: Lingo@local_postgresql_5432  # 数据库密码
     driver-class-name: org.postgresql.Driver  # PostgreSQL数据库驱动类
