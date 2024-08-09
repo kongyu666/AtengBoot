@@ -6,11 +6,11 @@
 
     <!-- 项目坐标 -->
     <groupId>local.ateng</groupId>
-    <artifactId>AtengBoot</artifactId>
+    <artifactId>boot</artifactId>
     <version>${revision}</version>
-    <name>AtengBoot</name>
+    <name>AtengBootSingle</name>
     <description>
-        AtengBoot 单体架构
+        SpringBoot3 单体架构
     </description>
 
     <!-- 环境配置-->
